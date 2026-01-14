@@ -1,0 +1,80 @@
+name: 🐞 Bug Report
+description: Report a reproducible bug with sufficient technical details.
+title: "[BUG] "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ Issues without complete information will be closed.
+
+  - type: input
+    id: version
+    attributes:
+      label: ATLAS Version / Commit
+      description: Exact version or commit SHA.
+      placeholder: "v0.1.0 or commit SHA"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      options:
+        - atlas-appliance
+        - atlas-core
+        - atlas-connectors
+        - documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Describe the issue clearly and concisely.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps to reproduce the issue.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Error Output
+      description: Attach relevant logs. Remove secrets.
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have read the documentation
+          required: true
+        - label: This is not a support request
+          required: true
+        - label: I understand this project has limited support
+          required: true

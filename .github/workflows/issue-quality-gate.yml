@@ -1,0 +1,81 @@
+name: Issue Quality Gate
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  issues: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate issue content
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = (issue.body || "").trim();
+
+            // Skip pull request issues (rare but safe)
+            if (issue.pull_request) return;
+
+            // Minimal heuristics: require some substance.
+            // Tune these rules per repo if needed.
+            const rules = [
+              { name: "reproduction", test: /Steps to Reproduce|Reproduction|Étapes pour reproduire/i },
+              { name: "expected", test: /Expected Behavior|Comportement attendu/i },
+            ];
+
+            const hasMinLength = body.length >= 200;
+            const missing = rules.filter(r => !r.test.test(body)).map(r => r.name);
+
+            // If already labeled needs-info, don't spam the same comment repeatedly
+            const hasNeedsInfo = issue.labels.some(l => l.name === "needs-info");
+
+            if (!hasMinLength || missing.length > 0) {
+              // Apply label
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ["needs-info"]
+              });
+
+              if (!hasNeedsInfo) {
+                const lines = [];
+                lines.push("Thanks for the report. This issue is missing required information and is now labeled **needs-info**.");
+                lines.push("");
+                lines.push("Please update the issue with:");
+                if (!hasMinLength) lines.push("- More detail (minimum ~200 characters total)");
+                if (missing.includes("reproduction")) lines.push("- **Steps to Reproduce** (exact steps)");
+                if (missing.includes("expected")) lines.push("- **Expected Behavior**");
+                lines.push("");
+                lines.push("If no update is provided within **7 days**, this issue will be automatically closed to keep the tracker actionable.");
+                lines.push("");
+                lines.push("Reminder: do not include secrets or private keys in logs.");
+
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: lines.join("\n")
+                });
+              }
+              return;
+            }
+
+            // If issue becomes complete, remove needs-info label (optional but nice)
+            if (hasNeedsInfo) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: "needs-info"
+                });
+              } catch (e) {
+                // ignore
+              }
+            }

@@ -1,0 +1,30 @@
+name: 📘 Documentation Improvement
+description: Suggest an improvement or correction to documentation.
+title: "[DOC] "
+labels: ["documentation"]
+
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Documentation Location
+      description: File or section to improve.
+      placeholder: "docs/install.md"
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Improvement
+      description: Describe what should be clarified or corrected.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmation
+      options:
+        - label: This request does not include feature requests
+          required: true

@@ -1,0 +1,57 @@
+name: Auto-close incomplete issues
+
+on:
+  schedule:
+    - cron: "25 2 * * *" # daily at 02:25 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close stale needs-info issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // Close after 7 days without update
+            const DAYS = 7;
+            const cutoff = new Date(Date.now() - DAYS * 24 * 60 * 60 * 1000);
+
+            // Search issues labeled needs-info that are still open
+            // Note: GitHub search indexes updated date.
+            const q = `repo:${owner}/${repo} is:issue is:open label:"needs-info" sort:updated-asc`;
+            const res = await github.rest.search.issuesAndPullRequests({ q, per_page: 100 });
+
+            for (const item of res.data.items) {
+              const updated = new Date(item.updated_at);
+              if (updated <= cutoff) {
+                // Comment then close
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: item.number,
+                  body: `Auto-closing this issue because it has been labeled **needs-info** and no update was provided for **${DAYS} days**.\n\nIf you can provide the missing details, feel free to reopen with the required information.`
+                });
+
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: item.number,
+                  state: "closed"
+                });
+
+                // Add label for tracking
+                await github.rest.issues.addLabels({
+                  owner,
+                  repo,
+                  issue_number: item.number,
+                  labels: ["auto-closed"]
+                });
+              }
+            }
