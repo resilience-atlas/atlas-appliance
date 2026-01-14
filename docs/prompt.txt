@@ -1,0 +1,24 @@
+You are working in repository "atlas-appliance".
+Read docs/AI_BRIEF.md as the single source of truth.
+
+Task:
+1) Generate a production-grade docker-compose.yml that matches the architecture and constraints in AI_BRIEF:
+   - services: atlas-core, n8n, postgres
+   - networks: external "traefik" + internal "atlas-internal"
+   - no public ports by default; expose via Traefik labels
+   - named volumes for persistence
+   - healthchecks
+   - configuration only via env vars
+
+2) Generate a .env.example listing all required variables with safe placeholders.
+
+3) Generate install.sh that is idempotent:
+   - checks prerequisites (docker, compose, permissions, disk)
+   - creates required networks/volumes if needed
+   - prints clear next steps and troubleshooting hints
+
+Constraints:
+- No secrets committed; never hardcode passwords
+- Keep scripts defensive; clear error messages
+- Follow EPIC 01 (deployment), EPIC 05 (security), EPIC 06 (UX), EPIC 08 (observability)
+Return only the file contents for each file.

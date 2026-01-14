@@ -1,1 +1,11 @@
-# docker-compose.yml
+# ATLAS Appliance - docker-compose.yml
+# Spec:
+# - Services: atlas-core, n8n, postgres (for n8n)
+# - Uses external Traefik network: traefik
+# - Creates internal network: atlas-internal
+# - No public ports; only Traefik labels expose routes
+# - Persistent volumes for n8n and postgres
+# - Healthchecks enabled
+# - Config via env vars; no secrets in repo (use .env)
+# - Labels: traefik routers for n8n and atlas-core API
+
