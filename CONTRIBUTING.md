@@ -38,4 +38,6 @@ Toutes les contributions et l'utilisation de ce dépôt sont soumises aux termes
 - En contribuant, vous acceptez que vos apports soient intégrés sous cette licence.
 - Merci de lire attentivement le fichier LICENSE pour connaître vos droits et obligations.
 
+**Toutes les contributions doivent également respecter le Code of Conduct du projet (voir CODE_OF_CONDUCT.md).**
+
 Thank you for respecting the project scope.
